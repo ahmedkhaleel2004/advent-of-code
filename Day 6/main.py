@@ -1,6 +1,6 @@
 # small input method, just loop over time
-
-times, distances = [list(map(int, line.split(":")[1].split())) for line in open(0)]
+# always becareful of the input size .
+times, distances = [list(map(int, ["".join(line.split(":")[1].split())])) for line in open(0)]
 
 n = 1
 

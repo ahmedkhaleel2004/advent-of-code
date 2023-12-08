@@ -3,9 +3,9 @@
 # the same classification, like KK677 and KTJJT and ultimately i feel like you would need a letter map.
 # hyper neutrino ofc
 
-letter_map = { "T": "A", "J": "B", "Q": "C", "K": "D", "A": "E"}
+letter_map = { "T": "A", "J": ".", "Q": "C", "K": "D", "A": "E"}
 
-def classify(hand):
+def score(hand):
     counts = [hand.count(card) for card in hand]
     
     if 5 in counts:
@@ -21,6 +21,19 @@ def classify(hand):
     if 2 in counts:
         return 1
     return 0
+
+def replacements(hand):
+    if hand == "":
+        return [""]
+    
+    return [
+        x + y 
+        for x in ("23456789TQKA" if hand[0] == "J" else hand[0])
+        for y in replacements(hand[1:]) # oh my god - insane recursion??? makes sense. extremely genius
+    ]
+
+def classify(hand):
+    return max(map(score, replacements(hand)))
 
 def strength(hand):
     return (classify(hand), [letter_map.get(card, card) for card in hand])

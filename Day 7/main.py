@@ -1,7 +1,8 @@
 # my method was to use a hashmap to count the number of times each card shows up and classify from there
 # but this method uses less code, idk if its faster, but most importantly it accounts for having to sort
-# the same classification, like KK677 and KTJJT and ultimately i feel like you would need a letter map.
-# hyper neutrino ofc
+# the same classification, like KK677 and KTJJT and ultimately i feel like you would need a letter map. 
+#   -> update: count method is technically better, approved by hyper neutrino
+# solution from hyper neutrino ofc
 
 letter_map = { "T": "A", "J": ".", "Q": "C", "K": "D", "A": "E"}
 

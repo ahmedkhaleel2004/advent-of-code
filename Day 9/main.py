@@ -8,7 +8,7 @@ def extrapolate(arr):
     
     deltas = [y - x for x,y in zip(arr, arr[1:])]
     diff = extrapolate(deltas)
-    return arr[-1] + diff
+    return arr[0] - diff # 3 char diff - easy when you have this setup
 
 total = 0
 

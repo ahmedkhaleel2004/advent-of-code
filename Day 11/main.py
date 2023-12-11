@@ -6,7 +6,8 @@ empty_cols = [c for c, col in enumerate(zip(*grid)) if all(ch == "." for ch in c
 points = [(r, c) for r, row in enumerate(grid) for c, ch in enumerate(row) if ch == "#"]
 
 total = 0
-scale = 2 # use scale instead of modifying grid since part 2 will be scaling up (guessed)
+scale = 1000000 # use scale instead of modifying grid since part 2 will be scaling up (guessed)
+# part 2 changed scale to 1 million
 
 for i, (r1, c1) in enumerate(points):
     for (r2, c2) in points[:i]: # no double counting, 2->1, but not 1->2. combinations not permutations

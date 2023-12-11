@@ -12,29 +12,84 @@ for r, row in enumerate(grid):
         continue
     break
 
-# set for seen to make sure we dont visit twice and for length
-seen = {(sr, sc)}
+# set for loop to make sure we dont visit twice and for length
+loop = {(sr, sc)}
 # queue to make sure we scan nodes in orderly fashion
 q = deque([(sr, sc)])
+
+maybe_s = {"|", "-", "J", "L", "7", "F"}
 
 while q:
     r, c = q.popleft()
     ch = grid[r][c]
     # check every direction, using possible movement chars
-    if r > 0 and ch in "S|JL" and grid[r - 1][c] in "|7F" and (r - 1, c) not in seen:
-        seen.add((r - 1, c))
+    if r > 0 and ch in "S|JL" and grid[r - 1][c] in "|7F" and (r - 1, c) not in loop:
+        loop.add((r - 1, c))
         q.append((r - 1, c))
+        if ch == "S":
+            maybe_s &= {"|", "J", "L"}
 
-    if r < len(grid) - 1 and ch in "S|7F" and grid[r + 1][c] in "|JL" and (r + 1, c) not in seen:
-        seen.add((r + 1, c))
+    if r < len(grid) - 1 and ch in "S|7F" and grid[r + 1][c] in "|JL" and (r + 1, c) not in loop:
+        loop.add((r + 1, c))
         q.append((r + 1, c))
+        if ch == "S":
+            maybe_s &= {"|", "7", "F"}
 
-    if c > 0 and ch in "S-J7" and grid[r][c - 1] in "-LF" and (r, c - 1) not in seen:
-        seen.add((r, c - 1))
+    if c > 0 and ch in "S-J7" and grid[r][c - 1] in "-LF" and (r, c - 1) not in loop:
+        loop.add((r, c - 1))
         q.append((r, c - 1))
+        if ch == "S":
+            maybe_s &= {"-", "J", "7"}
 
-    if c < len(grid[r]) - 1 and ch in "S-LF" and grid[r][c + 1] in "-J7" and (r, c + 1) not in seen:
-        seen.add((r, c + 1))
+    if c < len(grid[r]) - 1 and ch in "S-LF" and grid[r][c + 1] in "-J7" and (r, c + 1) not in loop:
+        loop.add((r, c + 1))
         q.append((r, c + 1))
+        if ch == "S":
+            maybe_s &= {"-", "L", "F"}
 
-print(len(seen) // 2)
+# part 2 is crazy solution, some of the best logic ive ever written
+# tracks state of up or down as traversing to check crossed or not
+# although you could probably add half coords and flood fill for easier soln.
+
+assert len(maybe_s) == 1
+(S,) = maybe_s
+
+grid = [row.replace("S", S) for row in grid]
+grid = ["".join(ch if (r, c) in loop else "." for c, ch in enumerate(row)) for r, row in enumerate(grid)]
+
+outside = set()
+
+for r, row in enumerate(grid):
+    within = False # default outside
+    up = None
+    # going right...
+    # if hit L or F we are now in something like L---J or F---J. 
+    # if it is the latter, we crossed since they point in different directions
+    for c, ch in enumerate(row):
+        if ch == "|":
+            assert up is None
+            within = not within
+        elif ch == "-":
+            assert up is not None
+        elif ch in "LF":
+            assert up is None
+            up = ch == "L"
+        elif ch in "7J":
+            assert up is not None
+            if ch != ("J" if up else "7"):
+                within = not within
+            up = None
+        elif ch == ".":
+            pass
+        else:
+            raise RuntimeError(f"unexpected character (horizontally): {ch}")
+        if not within:
+            outside.add((r, c))
+
+# visualizing inside tiles
+# for r in range(len(grid)):
+#     for c in range(len(grid[r])):
+#         print("." if (r, c) in (outside | loop) else "#", end="")
+#     print()
+
+print(len(grid) * len(grid[0]) - len(outside | loop)) # num tiles - num tiles outside of or part of loop

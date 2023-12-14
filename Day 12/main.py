@@ -1,11 +1,19 @@
 # studying elec, watched hyper neutrino
 
+cache = {} # memoization for recursion
+# dont recalculate
+
 def count(cfg, nums):
     if cfg == "":
         return 1 if nums == () else 0
 
     if nums == ():
         return 0 if "#" in cfg else 1
+    
+    key = (cfg, nums)
+    
+    if key in cache:
+        return cache[key] # instant return
 
     result = 0
     
@@ -16,6 +24,8 @@ def count(cfg, nums):
         if nums[0] <= len(cfg) and "." not in cfg[:nums[0]] and (nums[0] == len(cfg) or cfg[nums[0]] != "#"):
             result += count(cfg[nums[0] + 1:], nums[1:])
 
+    cache[key] = result
+
     return result
 
 total = 0
@@ -23,6 +33,10 @@ total = 0
 for line in open(0):
     cfg, nums = line.split()
     nums = tuple(map(int, nums.split(",")))
+    
+    cfg = "?".join([cfg] * 5) # easy modification
+    nums *= 5
+    
     total += count(cfg, nums)
 
 print(total)

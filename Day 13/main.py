@@ -9,7 +9,8 @@ def find_mirror(grid):
         above = above[:len(below)]
         below = below[:len(above)]
         
-        if above == below:
+        # part 2: simply change condition to iterate through number of errors in above and below and return row idx of strictly 1 error
+        if sum(sum(0 if a == b else 1 for a, b in zip(x, y)) for x, y in zip(above, below)) == 1:
             return r
         
     return 0

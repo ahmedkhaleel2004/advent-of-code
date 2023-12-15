@@ -15,7 +15,9 @@ def hashfunc(step):
 
 total = 0
 
-# only thing that tripped me up was that the test case had "rn=1" in box 0 when it should be in box 30
+# only thing that tripped me up was that the test case had "rn=1" in box 0
+
+# nevermind to the above comment from last commit. i realized it only hashes the label and not the "=1" which turned out to be 0 idx
 
 # had to look at a solution here to confirm box_idx labelling
 boxes = [{} for _ in range(256)]

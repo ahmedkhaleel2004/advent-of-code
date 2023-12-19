@@ -1,4 +1,4 @@
-block1, block2 = open(0).read().split("\n\n")
+block1, _ = open(0).read().split("\n\n")
 
 workflows = {}
 
@@ -15,34 +15,42 @@ for line in block1.splitlines():
         n = int(comparison[2:])
         workflows[name][0].append((key, cmp, n, target))
 
-ops = { # this is used to map our `cmp` to its proper method
-    ">": int.__gt__,
-    "<": int.__lt__
-}
-
-def accept(item, name = "in"):
-    # base cases
+def count(ranges, name = "in"):
     if name == "R":
-        return False
+        return 0
     if name == "A":
-        return True
-
+        product = 1
+        for lo, hi in ranges.values():
+            product *= hi - lo + 1
+        return product
+    
     rules, fallback = workflows[name]
-    
+
+    total = 0
+
     for key, cmp, n, target in rules:
-        if ops[cmp](item[key], n): # safer than eval(f"{item[key]} {cmp} {n}")
-            return accept(item, target) # send it to its next target
-    
-    return accept(item, fallback) # must be fallback by now
+        lo, hi = ranges[key]
+        # updating the ranges
+        if cmp == "<":
+            T = (lo, n - 1)
+            F = (n, hi)
+        else:
+            T = (n + 1, hi)
+            F = (lo, n)
 
-total = 0
+        # check for empty ranges
+        if T[0] <= T[1]:
+            copy = dict(ranges)
+            copy[key] = T
+            total += count(copy, target) # i cannot properly explain what is happening here
+        if F[0] <= F[1]:
+            ranges = dict(ranges)
+            ranges[key] = F # but this updates the ranges again using the false range
+        else:
+            break
+    else:
+        total += count(ranges, fallback) # if didnt break, not included in rules -> fallback
+            
+    return total
 
-for line in block2.splitlines():
-    item = {}
-    for segment in line[1:-1].split(","):
-        ch, n = segment.split("=")
-        item[ch] = int(n)
-    if accept(item):
-        total += sum(item.values())
-
-print(total)
+print(count({key: (1, 4000) for key in "xmas"}))

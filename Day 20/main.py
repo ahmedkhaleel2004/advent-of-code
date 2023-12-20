@@ -1,3 +1,4 @@
+from math import lcm
 from collections import deque
 
 class Module:
@@ -31,25 +32,43 @@ for name, module in modules.items():
         if output in modules and modules[output].type == "&":
             modules[output].memory[name] = "lo" # initialize all conjunction inputs to lo
 
-lo = hi = 0
+(feed,) = [name for name, module in modules.items() if "rx" in module.outputs] # asserts only one feed into rx
 
-for _ in range(1000):
-    lo += 1
+# i needed some conceptual help for part 2 but essentially:
+# the solution to part 2 is based on the theory that all inputs into the feed conjunction will be hi
+# (thus sending a lo signal) for the first time at the lcm of their cycle lengths (button presses to hit hi)
+
+cycle_lengths = {}
+seen = {name: 0 for name, module in modules.items() if feed in module.outputs}
+
+presses = 0
+
+while True:
+    presses += 1
     q = deque([("broadcaster", x, "lo") for x in broadcast_targets])
     
     while q:
-        # just do what the problem told you to
         origin, target, pulse = q.popleft()
-
-        if pulse == "lo":
-            lo += 1
-        else:
-            hi += 1
         
         if target not in modules:
             continue
         
         module = modules[target]
+        
+        if module.name == feed and pulse == "hi":
+            seen[origin] += 1
+
+            if origin not in cycle_lengths:
+                cycle_lengths[origin] = presses
+            else:
+                assert presses == seen[origin] * cycle_lengths[origin]
+                
+            if all(seen.values()):
+                x = 1
+                for cycle_length in cycle_lengths.values():
+                    x = lcm(x, cycle_length)
+                print(x)
+                exit(0)
         
         if module.type == "%":
             if pulse == "lo":
@@ -62,5 +81,3 @@ for _ in range(1000):
             outgoing = "lo" if all(x == "hi" for x in module.memory.values()) else "hi"
             for x in module.outputs:
                 q.append((module.name, x, outgoing))
-
-print(lo * hi)

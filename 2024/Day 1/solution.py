@@ -5,9 +5,9 @@ for line in open(0).read().splitlines():
     left.append(int(nums[0]))
     right.append(int(nums[-1]))
 
-left, right = sorted(left), sorted(right)
+total = 0
 
-for num1, num2 in tuple(zip(left, right)):
-    diffs.append(int(max(num1, num2) - min(num1, num2)))
+for num in left:
+    total += num * right.count(num)
 
-print(sum(diffs))
+print(total)

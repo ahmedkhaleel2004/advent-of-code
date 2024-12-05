@@ -1,4 +1,5 @@
 from collections import defaultdict
+import functools
 
 file = open(0)
 
@@ -21,10 +22,23 @@ def is_valid(update):
     return True
 
 
+def cmp(x, y):
+    if x in rules[y]:
+        return 1
+    elif x not in rules[y]:
+        return -1
+    else:
+        return 0
+
+
 for line in file:
     update = list(map(int, (line.split(","))))
 
     if is_valid(update):
-        total += update[len(update)//2]
+        continue
+
+    # sort based on whether x is in y's list
+    update.sort(key=functools.cmp_to_key(cmp))
+    total += update[len(update) // 2]
 
 print(total)

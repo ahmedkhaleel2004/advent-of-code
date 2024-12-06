@@ -1,55 +1,53 @@
 # very unoptimized and ugly
+# note: i spent 2 hours trying to do part 2, which i technically coded correctly
+# ... except for the fact that it was going to take like a month to run on the input 💀
+# i completely brute forced it in the least optimal way possible, it was like O(N!)
+# so i watched hyperneutrino's solution and realized how trash my code is.
 
-grid = [list(row) for row in open(0).read().splitlines()]
+# albeit this code is still bruteforced and pretty slow, its no where near how UGLY and slow mine was
 
-seen = set()
+grid = list(map(list, open(0).read().splitlines()))
 
+rows = len(grid)
+cols = len(grid[0])
 
-def print_grid():
-    for row in grid:
-        print("".join(row))
-
-
-def move():
-    for r, row in enumerate(grid):
-        for c, char in enumerate(row):
-            if char in "^<>v":
-                seen.add((r, c))
-                if char == "^":
-                    if r == 0:
-                        grid[r][c] = "."
-                    elif grid[r - 1][c] == "#":
-                        grid[r][c] = ">"
-                    else:
-                        grid[r - 1][c] = "^"
-                        grid[r][c] = "."
-                elif char == ">":
-                    if c == len(row) - 1:
-                        grid[r][c] = "."
-                    elif grid[r][c + 1] == "#":
-                        grid[r][c] = "v"
-                    else:
-                        grid[r][c + 1] = ">"
-                        grid[r][c] = "."
-                elif char == "v":
-                    if r == len(grid) - 1:
-                        grid[r][c] = "."
-                    elif grid[r + 1][c] == "#":
-                        grid[r][c] = "<"
-                    else:
-                        grid[r + 1][c] = "v"
-                        grid[r][c] = "."
-                elif char == "<":
-                    if c == 0:
-                        grid[r][c] = "."
-                    elif grid[r][c - 1] == "#":
-                        grid[r][c] = "^"
-                    else:
-                        grid[r][c - 1] = "<"
-                        grid[r][c] = "."
+for r in range(rows):
+    for c in range(cols):
+        if grid[r][c] == "^":
+            break
+    else:
+        continue
+    break
 
 
-while any(char in row for row in grid for char in "^<>v"):
-    move()
+def loops(grid, r, c):
+    dr = -1
+    dc = 0
 
-print(len(seen))
+    seen = set()
+
+    while True:
+        seen.add((r, c, dr, dc))
+        if r + dr < 0 or r + dr >= rows or c + dc < 0 or c + dc >= cols:
+            return False
+        if grid[r + dr][c + dc] == "#":
+            dc, dr = -dr, dc
+        else:
+            r += dr
+            c += dc
+        if (r, c, dr, dc) in seen:
+            return True
+
+
+count = 0
+
+for cr in range(rows):
+    for cc in range(cols):
+        if grid[cr][cc] != ".":
+            continue
+        grid[cr][cc] = "#"
+        if loops(grid, r, c):
+            count += 1
+        grid[cr][cc] = "."
+
+print(count)
